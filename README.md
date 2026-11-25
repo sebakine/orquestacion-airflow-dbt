@@ -27,27 +27,13 @@ script extraía, transformaba y cargaba; acá cada etapa tiene su herramienta.
 
 ```mermaid
 flowchart LR
-    subgraph fuentes[Fuentes públicas]
-        U[USGS<br/>catálogo de sismos]
-        M[mindicador.cl<br/>indicadores]
-    end
-    subgraph airflow[Airflow 3]
-        ES[extraccion_sismos<br/>diario, por intervalo]
-        EI[extraccion_indicadores<br/>diario, 1 tarea por indicador]
-        TD[transformacion_dbt<br/>se dispara por assets]
-    end
-    subgraph pg[(PostgreSQL · warehouse)]
-        RAW[raw<br/>JSON tal cual llega]
-        STG[staging]
-        INT[intermedia]
-        MARTS[marts<br/>modelo estrella]
-        SNAP[snapshots]
-    end
-    U --> ES --> RAW
-    M --> EI --> RAW
-    RAW -. asset actualizado .-> TD
-    TD --> STG --> INT --> MARTS
-    STG --> SNAP --> MARTS
+    U[USGS<br/>sismos] --> ES[DAG<br/>extraccion_sismos]
+    M[mindicador.cl<br/>indicadores] --> EI[DAG<br/>extraccion_indicadores]
+    ES --> RAW[(PostgreSQL<br/>esquema raw)]
+    EI --> RAW
+    RAW -- evento de asset --> TD[DAG transformacion_dbt<br/>dbt + Cosmos]
+    TD --> STG[staging] --> INT[intermedia] --> MARTS[(marts<br/>modelo estrella)]
+    STG --> SNAP[snapshot] --> MARTS
 ```
 
 1. **Extraer y cargar (EL)**: los DAGs de extracción guardan las respuestas de las APIs en el
@@ -132,8 +118,11 @@ La primera vez tarda unos minutos en construir la imagen. Después:
 4. Mira el resultado:
 
 ```bash
-docker compose exec postgres psql -U warehouse -d warehouse \
-  -c "select fecha, dolar, euro, uf, sismos, magnitud_maxima from marts.mart_resumen_diario order by fecha desc limit 7"
+docker compose exec postgres psql -U warehouse -d warehouse -c "
+  select fecha, dolar, euro, uf, sismos, magnitud_maxima
+  from marts.mart_resumen_diario
+  order by fecha desc
+  limit 7"
 ```
 
 Para detenerlo: `docker compose down` (los datos quedan en el volumen `pgdata`;
