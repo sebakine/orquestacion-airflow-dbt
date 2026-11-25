@@ -7,27 +7,69 @@ sources:
     loaded_at_field: cargado_en
     config:
       freshness:
-        warn_after: {count: 2, period: day}
-        error_after: {count: 7, period: day}
+        warn_after:
+          count: 2
+          period: day
+        error_after:
+          count: 7
+          period: day
     tables:
       - name: usgs_eventos
-        description: Un registro por sismo con la última versión publicada (GeoJSON completo en `payload`).
+        description: >-
+          Un registro por sismo con la última versión publicada (GeoJSON completo en `payload`).
         columns:
           - name: id
-            data_tests: [unique, not_null]
+            description: Identificador del sismo en USGS, por ejemplo `us6000phap`.
+            data_tests:
+              - unique
+              - not_null
+          - name: actualizado_ms
+            description: "{{ doc('col_actualizado_ms') }}"
+          - name: payload
+            description: "{{ doc('col_payload') }}"
+          - name: cargado_en
+            description: "{{ doc('col_cargado_en') }}"
+          - name: ejecucion
+            description: "{{ doc('col_ejecucion') }}"
 
   - name: mindicador
-    description: Indicadores económicos de mindicador.cl, cargados por el DAG `extraccion_indicadores`.
+    description: >-
+      Indicadores económicos de mindicador.cl, cargados por el DAG `extraccion_indicadores`.
     schema: raw
     loaded_at_field: cargado_en
     config:
       freshness:
-        warn_after: {count: 4, period: day}
-        error_after: {count: 10, period: day}
+        warn_after:
+          count: 4
+          period: day
+        error_after:
+          count: 10
+          period: day
     tables:
       - name: mindicador_indicadores
         columns:
           - name: codigo
-            data_tests: [unique, not_null]
+            description: Código del indicador en mindicador.cl.
+            data_tests:
+              - unique
+              - not_null
+          - name: nombre
+            description: Nombre del indicador según mindicador.cl.
+          - name: unidad_medida
+            description: "{{ doc('col_unidad_medida') }}"
+          - name: cargado_en
+            description: "{{ doc('col_cargado_en') }}"
+        description: Un registro por indicador con el JSON de su última respuesta.
       - name: mindicador_valores
         description: Un valor por indicador y fecha, tal como lo publica la API.
+        columns:
+          - name: codigo
+            description: Código del indicador en mindicador.cl.
+          - name: fecha
+            description: Fecha tal como la publica la API (texto ISO 8601 en UTC).
+          - name: valor
+            description: "{{ doc('col_valor') }}"
+          - name: cargado_en
+            description: "{{ doc('col_cargado_en') }}"
+          - name: ejecucion
+            description: "{{ doc('col_ejecucion') }}"

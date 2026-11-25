@@ -103,4 +103,5 @@ jobs:
           uv pip install --python ../.dbt-venv "dbt-core==$DBT_VERSION" "dbt-postgres==$DBT_POSTGRES_VERSION"
           ../.dbt-venv/bin/dbt build --profiles-dir .
           ../.dbt-venv/bin/dbt docs generate --profiles-dir . --static
+          python scripts/revisar_documentacion.py target
           mkdir -p ../sitio && cp target/static_index.html ../sitio/index.html

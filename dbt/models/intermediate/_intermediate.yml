@@ -2,12 +2,39 @@ version: 2
 
 models:
   - name: int_sismos__ubicados
-    description: >
-      Sismos reales (sin explosiones ni eventos eliminados) con el lugar separado en
-      distancia, dirección, ciudad y país, y la región de Chile según el epicentro.
+    description: >-
+      Sismos reales (sin explosiones ni eventos eliminados) con el lugar separado en distancia, dirección,
+      ciudad y país, y la región de Chile según el epicentro.
     columns:
       - name: sismo_id
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_sismo_id') }}"
+        data_tests:
+          - unique
+          - not_null
+      - name: origen_utc
+        description: "{{ doc('col_origen_utc') }}"
+      - name: actualizado_utc
+        description: "{{ doc('col_actualizado_utc') }}"
+      - name: magnitud
+        description: "{{ doc('col_magnitud') }}"
+      - name: tipo_magnitud
+        description: "{{ doc('col_tipo_magnitud') }}"
+      - name: latitud
+        description: "{{ doc('col_latitud') }}"
+      - name: longitud
+        description: "{{ doc('col_longitud') }}"
+      - name: profundidad_km
+        description: "{{ doc('col_profundidad_km') }}"
+      - name: lugar
+        description: "{{ doc('col_lugar') }}"
+      - name: distancia_km
+        description: "{{ doc('col_distancia_km') }}"
+      - name: direccion
+        description: "{{ doc('col_direccion') }}"
+      - name: ciudad_referencia
+        description: "{{ doc('col_ciudad_referencia') }}"
+      - name: pais
+        description: "{{ doc('col_pais') }}"
       - name: region_codigo
         description: Null si el sismo ocurrió fuera de Chile.
         data_tests:
@@ -15,38 +42,108 @@ models:
               arguments:
                 to: ref('regiones_chile')
                 field: region_codigo
+      - name: estado_revision
+        description: "{{ doc('col_estado_revision') }}"
+      - name: alerta_tsunami
+        description: "{{ doc('col_alerta_tsunami') }}"
+      - name: reportes_sentido
+        description: "{{ doc('col_reportes_sentido') }}"
+      - name: url_usgs
+        description: "{{ doc('col_url_usgs') }}"
+      - name: cargado_en
+        description: "{{ doc('col_cargado_en') }}"
 
   - name: int_indicadores__diario_completo
     description: Un valor por indicador y día, arrastrando el último valor publicado.
     data_tests:
       - combinacion_unica:
           arguments:
-            columnas: [indicador_codigo, fecha]
+            columnas:
+              - indicador_codigo
+              - fecha
     columns:
+      - name: indicador_codigo
+        description: "{{ doc('col_indicador_codigo') }}"
+      - name: fecha
+        description: "{{ doc('col_fecha') }}"
       - name: valor
-        data_tests: [not_null]
-
+        description: "{{ doc('col_valor') }}"
+        data_tests:
+          - not_null
+      - name: es_publicado
+        description: "{{ doc('col_es_publicado') }}"
 unit_tests:
   - name: separa_el_lugar_de_usgs_y_asigna_region
-    description: El texto de USGS se separa en distancia, dirección, ciudad y país; fuera de Chile no hay región.
+    description: >-
+      El texto de USGS se separa en distancia, dirección, ciudad y país; fuera de Chile no hay región.
     model: int_sismos__ubicados
     given:
       - input: ref('stg_usgs__sismos')
         rows:
-          - {sismo_id: a, magnitud: 4.1, tipo_evento: earthquake, estado_revision: reviewed, latitud: -22.9, longitud: -68.9, lugar: "84 km NNW of Calama, Chile"}
-          - {sismo_id: b, magnitud: 3.0, tipo_evento: earthquake, estado_revision: automatic, latitud: -24.2, longitud: -66.3, lugar: "San Antonio de los Cobres, Argentina"}
-          - {sismo_id: c, magnitud: 2.8, tipo_evento: quarry blast, estado_revision: reviewed, latitud: -22.9, longitud: -68.9, lugar: "Calama, Chile"}
-          - {sismo_id: d, magnitud: 5.0, tipo_evento: earthquake, estado_revision: reviewed, latitud: -33.4, longitud: -70.6, lugar: "5 km S of Santiago, Chile"}
-          - {sismo_id: e, magnitud: 4.0, tipo_evento: earthquake, estado_revision: reviewed, latitud: -33.0, longitud: -71.9, lugar: "offshore Valparaíso"}
+          - sismo_id: a
+            magnitud: 4.1
+            tipo_evento: earthquake
+            estado_revision: reviewed
+            latitud: -22.9
+            longitud: -68.9
+            lugar: 84 km NNW of Calama, Chile
+          - sismo_id: b
+            magnitud: 3.0
+            tipo_evento: earthquake
+            estado_revision: automatic
+            latitud: -24.2
+            longitud: -66.3
+            lugar: San Antonio de los Cobres, Argentina
+          - sismo_id: c
+            magnitud: 2.8
+            tipo_evento: quarry blast
+            estado_revision: reviewed
+            latitud: -22.9
+            longitud: -68.9
+            lugar: Calama, Chile
+          - sismo_id: d
+            magnitud: 5.0
+            tipo_evento: earthquake
+            estado_revision: reviewed
+            latitud: -33.4
+            longitud: -70.6
+            lugar: 5 km S of Santiago, Chile
+          - sismo_id: e
+            magnitud: 4.0
+            tipo_evento: earthquake
+            estado_revision: reviewed
+            latitud: -33.0
+            longitud: -71.9
+            lugar: offshore Valparaíso
       - input: ref('regiones_chile')
         format: csv
         fixture: regiones_chile_prueba
     expect:
       rows:
-        - {sismo_id: a, distancia_km: 84, direccion: NNW, ciudad_referencia: Calama, pais: Chile, region_codigo: "02"}
-        - {sismo_id: b, distancia_km: null, direccion: null, ciudad_referencia: San Antonio de los Cobres, pais: Argentina, region_codigo: null}
-        - {sismo_id: d, distancia_km: 5, direccion: S, ciudad_referencia: Santiago, pais: Chile, region_codigo: "13"}
-        - {sismo_id: e, distancia_km: null, direccion: null, ciudad_referencia: offshore Valparaíso, pais: Desconocido, region_codigo: null}
+        - sismo_id: a
+          distancia_km: 84
+          direccion: NNW
+          ciudad_referencia: Calama
+          pais: Chile
+          region_codigo: '02'
+        - sismo_id: b
+          distancia_km: null
+          direccion: null
+          ciudad_referencia: San Antonio de los Cobres
+          pais: Argentina
+          region_codigo: null
+        - sismo_id: d
+          distancia_km: 5
+          direccion: S
+          ciudad_referencia: Santiago
+          pais: Chile
+          region_codigo: '13'
+        - sismo_id: e
+          distancia_km: null
+          direccion: null
+          ciudad_referencia: offshore Valparaíso
+          pais: Desconocido
+          region_codigo: null
 
   - name: arrastra_el_ultimo_valor_en_dias_sin_publicacion
     description: El viernes se repite el sábado y el domingo, hasta el tope de días de arrastre.
@@ -54,20 +151,45 @@ unit_tests:
     given:
       - input: ref('stg_mindicador__valores')
         rows:
-          - {indicador_codigo: dolar, fecha: 2025-01-03, valor: 950, es_valido: true}
-          - {indicador_codigo: dolar, fecha: 2025-01-06, valor: 960, es_valido: true}
-          - {indicador_codigo: dolar, fecha: 2025-01-05, valor: -1, es_valido: false}
+          - indicador_codigo: dolar
+            fecha: 2025-01-03
+            valor: 950
+            es_valido: true
+          - indicador_codigo: dolar
+            fecha: 2025-01-06
+            valor: 960
+            es_valido: true
+          - indicador_codigo: dolar
+            fecha: 2025-01-05
+            valor: -1
+            es_valido: false
       - input: ref('indicadores_catalogo')
         rows:
-          - {indicador_codigo: dolar, dias_arrastre: 1}
+          - indicador_codigo: dolar
+            dias_arrastre: 1
       - input: ref('dim_fecha')
         format: sql
-        rows: |
+        rows: >-
           select generate_series('2025-01-01'::date, '2025-01-31'::date, interval '1 day')::date as fecha
     expect:
       rows:
-        - {indicador_codigo: dolar, fecha: 2025-01-03, valor: 950, es_publicado: true}
-        - {indicador_codigo: dolar, fecha: 2025-01-04, valor: 950, es_publicado: false}
-        - {indicador_codigo: dolar, fecha: 2025-01-05, valor: 950, es_publicado: false}
-        - {indicador_codigo: dolar, fecha: 2025-01-06, valor: 960, es_publicado: true}
-        - {indicador_codigo: dolar, fecha: 2025-01-07, valor: 960, es_publicado: false}
+        - indicador_codigo: dolar
+          fecha: 2025-01-03
+          valor: 950
+          es_publicado: true
+        - indicador_codigo: dolar
+          fecha: 2025-01-04
+          valor: 950
+          es_publicado: false
+        - indicador_codigo: dolar
+          fecha: 2025-01-05
+          valor: 950
+          es_publicado: false
+        - indicador_codigo: dolar
+          fecha: 2025-01-06
+          valor: 960
+          es_publicado: true
+        - indicador_codigo: dolar
+          fecha: 2025-01-07
+          valor: 960
+          es_publicado: false

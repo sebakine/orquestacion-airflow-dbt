@@ -1,11 +1,52 @@
 snapshots:
   - name: snap_usgs_sismos
-    description: >
-      Historial de versiones de cada sismo (dimensión de cambio lento tipo 2). USGS publica
-      primero un cálculo automático y después lo revisa: la magnitud, la ubicación o el estado
-      pueden cambiar. La capa raw guarda solo la última versión; este snapshot conserva todas.
+    description: >-
+      Historial de versiones de cada sismo (dimensión de cambio lento tipo 2). USGS publica primero un
+      cálculo automático y después lo revisa: la magnitud, la ubicación o el estado pueden cambiar. La
+      capa raw guarda solo la última versión; este snapshot conserva todas.
     relation: ref('stg_usgs__sismos')
     config:
       unique_key: sismo_id
       strategy: timestamp
       updated_at: actualizado_utc
+    columns:
+      - name: sismo_id
+        description: "{{ doc('col_sismo_id') }}"
+      - name: origen_utc
+        description: "{{ doc('col_origen_utc') }}"
+      - name: actualizado_utc
+        description: "{{ doc('col_actualizado_utc') }}"
+      - name: magnitud
+        description: "{{ doc('col_magnitud') }}"
+      - name: tipo_magnitud
+        description: "{{ doc('col_tipo_magnitud') }}"
+      - name: latitud
+        description: "{{ doc('col_latitud') }}"
+      - name: longitud
+        description: "{{ doc('col_longitud') }}"
+      - name: profundidad_km
+        description: "{{ doc('col_profundidad_km') }}"
+      - name: lugar
+        description: "{{ doc('col_lugar') }}"
+      - name: tipo_evento
+        description: "{{ doc('col_tipo_evento') }}"
+      - name: estado_revision
+        description: "{{ doc('col_estado_revision') }}"
+      - name: alerta_tsunami
+        description: "{{ doc('col_alerta_tsunami') }}"
+      - name: reportes_sentido
+        description: "{{ doc('col_reportes_sentido') }}"
+      - name: significancia
+        description: "{{ doc('col_significancia') }}"
+      - name: url_usgs
+        description: "{{ doc('col_url_usgs') }}"
+      - name: cargado_en
+        description: "{{ doc('col_cargado_en') }}"
+      - name: dbt_scd_id
+        description: "{{ doc('col_dbt_scd_id') }}"
+      - name: dbt_updated_at
+        description: "{{ doc('col_dbt_updated_at') }}"
+      - name: dbt_valid_from
+        description: "{{ doc('col_dbt_valid_from') }}"
+      - name: dbt_valid_to
+        description: "{{ doc('col_dbt_valid_to') }}"

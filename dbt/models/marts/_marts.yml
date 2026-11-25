@@ -5,18 +5,47 @@ models:
     description: Calendario con nombres de mes y día en español.
     columns:
       - name: fecha
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_fecha') }}"
+        data_tests:
+          - unique
+          - not_null
+      - name: anio
+        description: "{{ doc('col_anio') }}"
+      - name: trimestre
+        description: "{{ doc('col_trimestre') }}"
+      - name: mes
+        description: Número del mes (1 a 12).
+      - name: dia
+        description: "{{ doc('col_dia') }}"
+      - name: dia_semana
+        description: "{{ doc('col_dia_semana') }}"
+      - name: nombre_mes
+        description: "{{ doc('col_nombre_mes') }}"
+      - name: nombre_dia
+        description: "{{ doc('col_nombre_dia') }}"
+      - name: es_fin_de_semana
+        description: "{{ doc('col_es_fin_de_semana') }}"
+      - name: inicio_mes
+        description: "{{ doc('col_inicio_mes') }}"
 
   - name: dim_region
     description: Regiones de Chile ordenadas de norte a sur.
     columns:
       - name: region_codigo
-        data_tests: [unique, not_null]
+        description: Código oficial de la región de Chile.
+        data_tests:
+          - unique
+          - not_null
+      - name: region_nombre
+        description: "{{ doc('col_region_nombre') }}"
+      - name: orden_norte_sur
+        description: "{{ doc('col_orden_norte_sur') }}"
 
   - name: dim_indicador
     description: Indicadores económicos disponibles.
     columns:
       - name: indicador_codigo
+        description: "{{ doc('col_indicador_codigo') }}"
         data_tests:
           - unique
           - not_null
@@ -26,103 +55,236 @@ models:
                 field: indicador_codigo
               config:
                 severity: warn
+      - name: indicador_nombre
+        description: "{{ doc('col_indicador_nombre') }}"
+      - name: unidad_medida
+        description: "{{ doc('col_unidad_medida') }}"
+      - name: periodicidad
+        description: "{{ doc('col_periodicidad') }}"
+      - name: descripcion
+        description: "{{ doc('col_descripcion') }}"
 
   - name: fct_sismos
-    description: >
-      Un sismo por fila. Incremental: solo procesa los sismos nuevos o revisados desde
-      la última corrida. Tiene contrato: si cambian el nombre o el tipo de una columna, dbt falla
-      antes de romper a quien consume la tabla.
+    description: >-
+      Un sismo por fila. Incremental: solo procesa los sismos nuevos o revisados desde la última corrida.
+      Tiene contrato: si cambian el nombre o el tipo de una columna, dbt falla antes de romper a quien
+      consume la tabla.
     config:
       contract:
         enforced: true
     constraints:
       - type: primary_key
-        columns: [sismo_id]
+        columns:
+          - sismo_id
     columns:
-      - {name: sismo_id, data_type: text, data_tests: [unique, not_null]}
+      - name: sismo_id
+        description: "{{ doc('col_sismo_id') }}"
+        data_type: text
+        data_tests:
+          - unique
+          - not_null
       - name: fecha
-        data_type: date
         description: Fecha del sismo en hora de Chile.
+        data_type: date
         data_tests:
           - not_null
           - relationships:
-              arguments: {to: ref('dim_fecha'), field: fecha}
+              arguments:
+                to: ref('dim_fecha')
+                field: fecha
       - name: region_codigo
-        data_type: text
         description: Null si ocurrió fuera de Chile.
+        data_type: text
         data_tests:
           - relationships:
-              arguments: {to: ref('dim_region'), field: region_codigo}
-      - {name: origen_utc, data_type: timestamptz}
-      - {name: origen_hora_chile, data_type: timestamp}
+              arguments:
+                to: ref('dim_region')
+                field: region_codigo
+      - name: origen_utc
+        description: "{{ doc('col_origen_utc') }}"
+        data_type: timestamptz
+      - name: origen_hora_chile
+        description: "{{ doc('col_origen_hora_chile') }}"
+        data_type: timestamp
       - name: magnitud
+        description: "{{ doc('col_magnitud') }}"
         data_type: numeric(4, 2)
         data_tests:
           - not_null
           - en_rango:
-              arguments: {minimo: 0, maximo: 10}
-      - {name: tipo_magnitud, data_type: text}
+              arguments:
+                minimo: 0
+                maximo: 10
+      - name: tipo_magnitud
+        description: "{{ doc('col_tipo_magnitud') }}"
+        data_type: text
       - name: categoria
+        description: "{{ doc('col_categoria') }}"
         data_type: text
         data_tests:
           - accepted_values:
               arguments:
-                values: [menor, ligero, moderado, fuerte, mayor]
+                values:
+                  - menor
+                  - ligero
+                  - moderado
+                  - fuerte
+                  - mayor
       - name: profundidad_km
+        description: "{{ doc('col_profundidad_km') }}"
         data_type: numeric(7, 2)
         data_tests:
           - en_rango:
-              arguments: {minimo: -5, maximo: 800}
-      - {name: es_superficial, data_type: boolean}
-      - {name: latitud, data_type: "numeric(8, 4)"}
-      - {name: longitud, data_type: "numeric(8, 4)"}
-      - {name: lugar, data_type: text}
-      - {name: ciudad_referencia, data_type: text}
-      - {name: pais, data_type: text}
-      - {name: distancia_km, data_type: "numeric(6, 1)"}
-      - {name: estado_revision, data_type: text}
-      - {name: alerta_tsunami, data_type: boolean}
-      - {name: reportes_sentido, data_type: integer}
-      - {name: url_usgs, data_type: text}
-      - {name: actualizado_utc, data_type: timestamptz}
-      - name: cargado_en
+              arguments:
+                minimo: -5
+                maximo: 800
+      - name: es_superficial
+        description: "{{ doc('col_es_superficial') }}"
+        data_type: boolean
+      - name: latitud
+        description: "{{ doc('col_latitud') }}"
+        data_type: numeric(8, 4)
+      - name: longitud
+        description: "{{ doc('col_longitud') }}"
+        data_type: numeric(8, 4)
+      - name: lugar
+        description: "{{ doc('col_lugar') }}"
+        data_type: text
+      - name: ciudad_referencia
+        description: "{{ doc('col_ciudad_referencia') }}"
+        data_type: text
+      - name: pais
+        description: "{{ doc('col_pais') }}"
+        data_type: text
+      - name: distancia_km
+        description: "{{ doc('col_distancia_km') }}"
+        data_type: numeric(6, 1)
+      - name: estado_revision
+        description: "{{ doc('col_estado_revision') }}"
+        data_type: text
+      - name: alerta_tsunami
+        description: "{{ doc('col_alerta_tsunami') }}"
+        data_type: boolean
+      - name: reportes_sentido
+        description: "{{ doc('col_reportes_sentido') }}"
+        data_type: integer
+      - name: url_usgs
+        description: "{{ doc('col_url_usgs') }}"
+        data_type: text
+      - name: actualizado_utc
+        description: "{{ doc('col_actualizado_utc') }}"
         data_type: timestamptz
+      - name: cargado_en
         description: Cuándo llegó esta versión del sismo al warehouse; lo usa la carga incremental.
+        data_type: timestamptz
 
   - name: fct_indicadores_diarios
-    description: Un valor por indicador y día, con la variación porcentual respecto del día anterior.
+    description: >-
+      Un valor por indicador y día, con la variación porcentual respecto del día anterior.
     data_tests:
       - combinacion_unica:
           arguments:
-            columnas: [indicador_codigo, fecha]
+            columnas:
+              - indicador_codigo
+              - fecha
     columns:
       - name: indicador_codigo
+        description: "{{ doc('col_indicador_codigo') }}"
         data_tests:
           - relationships:
-              arguments: {to: ref('dim_indicador'), field: indicador_codigo}
+              arguments:
+                to: ref('dim_indicador')
+                field: indicador_codigo
+      - name: fecha
+        description: "{{ doc('col_fecha') }}"
       - name: valor
+        description: "{{ doc('col_valor') }}"
         data_tests:
           - not_null
           - en_rango:
-              arguments: {minimo: 0}
+              arguments:
+                minimo: 0
       - name: es_publicado
         description: Falso cuando el valor se arrastró desde el último día publicado.
+      - name: variacion_diaria_pct
+        description: "{{ doc('col_variacion_diaria_pct') }}"
 
   - name: mart_sismos_mensuales
     description: Sismos por mes y región, con conteos, magnitud máxima y profundidad promedio.
     data_tests:
       - combinacion_unica:
           arguments:
-            columnas: [mes, region]
+            columnas:
+              - mes
+              - region
+    columns:
+      - name: mes
+        description: Primer día del mes.
+      - name: region
+        description: Nombre de la región, o `Fuera de Chile`.
+      - name: orden_norte_sur
+        description: "{{ doc('col_orden_norte_sur') }}"
+      - name: sismos
+        description: "{{ doc('col_sismos') }}"
+      - name: sismos_m5_o_mas
+        description: "{{ doc('col_sismos_m5_o_mas') }}"
+      - name: magnitud_maxima
+        description: "{{ doc('col_magnitud_maxima') }}"
+      - name: magnitud_promedio
+        description: "{{ doc('col_magnitud_promedio') }}"
+      - name: profundidad_promedio_km
+        description: "{{ doc('col_profundidad_promedio_km') }}"
 
   - name: mart_resumen_diario
     description: Un día por fila con los indicadores en columnas y la actividad sísmica del día.
     columns:
       - name: fecha
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_fecha') }}"
+        data_tests:
+          - unique
+          - not_null
+      - name: nombre_dia
+        description: "{{ doc('col_nombre_dia') }}"
+      - name: es_fin_de_semana
+        description: "{{ doc('col_es_fin_de_semana') }}"
+      - name: dolar
+        description: "{{ doc('col_dolar') }}"
+      - name: dolar_variacion_pct
+        description: "{{ doc('col_dolar_variacion_pct') }}"
+      - name: euro
+        description: "{{ doc('col_euro') }}"
+      - name: uf
+        description: "{{ doc('col_uf') }}"
+      - name: utm
+        description: "{{ doc('col_utm') }}"
+      - name: libra_cobre_usd
+        description: "{{ doc('col_libra_cobre_usd') }}"
+      - name: sismos
+        description: "{{ doc('col_sismos') }}"
+      - name: magnitud_maxima
+        description: "{{ doc('col_magnitud_maxima') }}"
 
   - name: mart_revisiones_sismos
     description: Sismos que USGS revisó, con la magnitud inicial y la actual.
     columns:
       - name: sismo_id
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_sismo_id') }}"
+        data_tests:
+          - unique
+          - not_null
+      - name: versiones
+        description: "{{ doc('col_versiones') }}"
+      - name: magnitud_inicial
+        description: "{{ doc('col_magnitud_inicial') }}"
+      - name: magnitud_actual
+        description: "{{ doc('col_magnitud_actual') }}"
+      - name: cambio_magnitud
+        description: "{{ doc('col_cambio_magnitud') }}"
+      - name: estado_inicial
+        description: "{{ doc('col_estado_inicial') }}"
+      - name: estado_actual
+        description: "{{ doc('col_estado_actual') }}"
+      - name: primera_version_en
+        description: "{{ doc('col_primera_version_en') }}"
+      - name: ultima_revision_en
+        description: "{{ doc('col_ultima_revision_en') }}"

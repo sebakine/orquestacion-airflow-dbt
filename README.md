@@ -144,6 +144,9 @@ make test-dags   # valida los DAGs dentro de la imagen de Airflow
 - **Tests de DAGs**: cargan los DAGs en un `DagBag` real dentro de la imagen y revisan que no
   haya errores de importación, que los reintentos estén configurados, que la transformación
   dependa de los assets correctos y que Cosmos haya generado una tarea por modelo.
+- **Documentación completa**: cada modelo, fuente, seed y columna tiene descripción (las que se
+  repiten viven en `dbt/models/docs/columnas.md`). El CI falla si aparece una columna sin
+  documentar (`dbt/scripts/revisar_documentacion.py`).
 - **CI** en GitHub Actions: lint, tests contra un PostgreSQL de servicio, construcción de la
   imagen de Airflow con los tests de DAGs, y publicación de la documentación de dbt en
   GitHub Pages en cada push a `main`.

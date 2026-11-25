@@ -2,11 +2,11 @@ version: 2
 
 seeds:
   - name: regiones_chile
-    description: >
-      Regiones de Chile con un rectángulo aproximado de latitud y longitud para asignar
-      cada sismo a una región. Es una aproximación: Chile es angosto y casi todas las
-      regiones se separan por latitud; la Región Metropolitana se resuelve primero
-      (prioridad 1) porque comparte latitudes con Valparaíso y O'Higgins.
+    description: >-
+      Regiones de Chile con un rectángulo aproximado de latitud y longitud para asignar cada sismo a una
+      región. Es una aproximación: Chile es angosto y casi todas las regiones se separan por latitud;
+      la Región Metropolitana se resuelve primero (prioridad 1) porque comparte latitudes con Valparaíso
+      y O'Higgins.
     config:
       column_types:
         region_codigo: text
@@ -17,22 +17,49 @@ seeds:
     columns:
       - name: region_codigo
         description: Código oficial de la región (01 a 16).
-        data_tests: [unique, not_null]
+        data_tests:
+          - unique
+          - not_null
       - name: region_nombre
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_region_nombre') }}"
+        data_tests:
+          - unique
+          - not_null
       - name: orden_norte_sur
         description: Posición de la región de norte a sur, para ordenar gráficos.
-        data_tests: [unique, not_null]
+        data_tests:
+          - unique
+          - not_null
+      - name: lat_desde
+        description: "{{ doc('col_lat_desde') }}"
+      - name: lat_hasta
+        description: "{{ doc('col_lat_hasta') }}"
+      - name: lon_desde
+        description: "{{ doc('col_lon_desde') }}"
+      - name: lon_hasta
+        description: "{{ doc('col_lon_hasta') }}"
+      - name: prioridad
+        description: "{{ doc('col_prioridad') }}"
 
   - name: indicadores_catalogo
-    description: >
-      Indicadores que el proyecto espera y cuántos días se puede arrastrar el último valor
-      cuando no hay publicación (fines de semana, feriados, o el resto del mes para la UTM).
+    description: >-
+      Indicadores que el proyecto espera y cuántos días se puede arrastrar el último valor cuando no hay
+      publicación (fines de semana, feriados, o el resto del mes para la UTM).
     columns:
       - name: indicador_codigo
-        data_tests: [unique, not_null]
+        description: "{{ doc('col_indicador_codigo') }}"
+        data_tests:
+          - unique
+          - not_null
       - name: periodicidad
+        description: "{{ doc('col_periodicidad') }}"
         data_tests:
           - accepted_values:
               arguments:
-                values: [diaria, mensual]
+                values:
+                  - diaria
+                  - mensual
+      - name: dias_arrastre
+        description: "{{ doc('col_dias_arrastre') }}"
+      - name: descripcion
+        description: "{{ doc('col_descripcion') }}"
