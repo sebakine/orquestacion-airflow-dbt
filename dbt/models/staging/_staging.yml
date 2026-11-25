@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_usgs__sismos
+    description: Sismos de USGS con tipos y nombres limpios. Un registro por sismo.
+    columns:
+      - name: sismo_id
+        description: Identificador de USGS, por ejemplo `us6000phap`.
+        data_tests: [unique, not_null]
+      - name: origen_utc
+        description: Hora de origen del sismo.
+        data_tests: [not_null, no_futuro]
+      - name: actualizado_utc
+        description: Última vez que USGS modificó el evento (cambia con cada revisión).
+        data_tests: [not_null]
+      - name: latitud
+        data_tests:
+          - en_rango:
+              arguments: {minimo: -90, maximo: 90}
+      - name: longitud
+        data_tests:
+          - en_rango:
+              arguments: {minimo: -180, maximo: 180}
+      - name: estado_revision
+        description: "`automatic` cuando lo calculó un algoritmo, `reviewed` cuando lo revisó un sismólogo."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [automatic, reviewed, deleted]
+      - name: tipo_evento
+        description: earthquake, quarry blast, explosion, etc. Solo los earthquake pasan a los marts.
+
+  - name: stg_mindicador__valores
+    description: Valores diarios (o mensuales, en el caso de la UTM) de cada indicador.
+    data_tests:
+      - combinacion_unica:
+          arguments:
+            columnas: [indicador_codigo, fecha_original]
+    columns:
+      - name: fecha
+        description: Fecha en Chile a la que corresponde el valor.
+      - name: es_valido
+        description: Falso si la fecha o el valor no se pudieron interpretar.
+
+  - name: stg_mindicador__indicadores
+    columns:
+      - name: indicador_codigo
+        data_tests: [unique, not_null]

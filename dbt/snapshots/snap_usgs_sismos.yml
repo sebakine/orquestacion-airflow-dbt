@@ -1,0 +1,11 @@
+snapshots:
+  - name: snap_usgs_sismos
+    description: >
+      Historial de versiones de cada sismo (dimensión de cambio lento tipo 2). USGS publica
+      primero un cálculo automático y después lo revisa: la magnitud, la ubicación o el estado
+      pueden cambiar. La capa raw guarda solo la última versión; este snapshot conserva todas.
+    relation: ref('stg_usgs__sismos')
+    config:
+      unique_key: sismo_id
+      strategy: timestamp
+      updated_at: actualizado_utc

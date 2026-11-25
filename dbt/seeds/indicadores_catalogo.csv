@@ -1,0 +1,6 @@
+indicador_codigo,periodicidad,dias_arrastre,descripcion
+dolar,diaria,4,Dólar observado publicado por el Banco Central cada día hábil
+euro,diaria,4,Euro en pesos chilenos cada día hábil
+libra_cobre,diaria,4,Precio de la libra de cobre en dólares cada día hábil
+uf,diaria,0,Unidad de fomento; se publica para todos los días del año
+utm,mensual,31,Unidad tributaria mensual; un valor por mes

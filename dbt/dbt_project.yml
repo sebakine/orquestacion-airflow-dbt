@@ -1,0 +1,39 @@
+name: chile
+version: "0.1.0"
+profile: chile
+require-dbt-version: [">=1.10.0", "<2.0.0"]
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Rango de dim_fecha. El fin se calcula como hoy + 1 año.
+  fecha_inicio: "2020-01-01"
+  zona_horaria: "America/Santiago"
+
+models:
+  chile:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermedia
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+seeds:
+  chile:
+    +schema: referencia
+
+snapshots:
+  chile:
+    +schema: snapshots

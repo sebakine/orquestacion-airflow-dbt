@@ -1,0 +1,38 @@
+version: 2
+
+seeds:
+  - name: regiones_chile
+    description: >
+      Regiones de Chile con un rectángulo aproximado de latitud y longitud para asignar
+      cada sismo a una región. Es una aproximación: Chile es angosto y casi todas las
+      regiones se separan por latitud; la Región Metropolitana se resuelve primero
+      (prioridad 1) porque comparte latitudes con Valparaíso y O'Higgins.
+    config:
+      column_types:
+        region_codigo: text
+        lat_desde: numeric
+        lat_hasta: numeric
+        lon_desde: numeric
+        lon_hasta: numeric
+    columns:
+      - name: region_codigo
+        description: Código oficial de la región (01 a 16).
+        data_tests: [unique, not_null]
+      - name: region_nombre
+        data_tests: [unique, not_null]
+      - name: orden_norte_sur
+        description: Posición de la región de norte a sur, para ordenar gráficos.
+        data_tests: [unique, not_null]
+
+  - name: indicadores_catalogo
+    description: >
+      Indicadores que el proyecto espera y cuántos días se puede arrastrar el último valor
+      cuando no hay publicación (fines de semana, feriados, o el resto del mes para la UTM).
+    columns:
+      - name: indicador_codigo
+        data_tests: [unique, not_null]
+      - name: periodicidad
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [diaria, mensual]

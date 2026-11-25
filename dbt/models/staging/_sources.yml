@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: usgs
+    description: Sismos de la API FDSN de USGS, cargados por el DAG `extraccion_sismos`.
+    schema: raw
+    loaded_at_field: cargado_en
+    config:
+      freshness:
+        warn_after: {count: 2, period: day}
+        error_after: {count: 7, period: day}
+    tables:
+      - name: usgs_eventos
+        description: Un registro por sismo con la última versión publicada (GeoJSON completo en `payload`).
+        columns:
+          - name: id
+            data_tests: [unique, not_null]
+
+  - name: mindicador
+    description: Indicadores económicos de mindicador.cl, cargados por el DAG `extraccion_indicadores`.
+    schema: raw
+    loaded_at_field: cargado_en
+    config:
+      freshness:
+        warn_after: {count: 4, period: day}
+        error_after: {count: 10, period: day}
+    tables:
+      - name: mindicador_indicadores
+        columns:
+          - name: codigo
+            data_tests: [unique, not_null]
+      - name: mindicador_valores
+        description: Un valor por indicador y fecha, tal como lo publica la API.
